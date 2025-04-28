@@ -22,22 +22,28 @@ class _CoursesWidgetState extends State<CoursesWidget> {
   int? semester;
   String? teacherID;
   static const majors = [
+    null,
     'Software Engineering',
     'Business Management',
     'Information Technology',
     'Art and Design',
     'Mechanical Engineering',
   ];
-  static const semesters = [1, 2];
-  static const levels = [1, 2, 3, 4];
+  static const semesters = [null, 1, 2];
   final major = TextEditingController();
   final List<TeacherModel> teachers = [];
   final teacher = TextEditingController();
+  static const levels = [null, 1, 2, 3, 4];
 
   @override
   void initState() {
     super.initState();
     context.read<MainRepo>().allTeachers().then((value) {
+      teachers.add(TeacherModel(
+        tid: null,
+        lastName: '',
+        name: tr('all'),
+      ));
       teachers.addAll(value);
       setState(() {});
     });
@@ -74,11 +80,11 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                       items: List.generate(levels.length, (index) {
                         return DropdownMenuItem(
                           value: levels[index],
-                          child: Text('${levels[index]}'),
+                          child: Text('${levels[index] ?? tr('all')}'),
                         );
                       }),
                       onChanged: (value) => setState(() {
-                        level = value!;
+                        level = value;
                       }),
                     ),
                   ),
@@ -90,18 +96,17 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     items: List.generate(semesters.length, (index) {
                       return DropdownMenuItem(
                         value: semesters[index],
-                        child: Text('${semesters[index]}'),
+                        child: Text('${semesters[index] ?? tr('all')}'),
                       );
                     }),
                     onChanged: (value) => setState(() {
-                      semester = value!;
+                      semester = value;
                     }),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: DropdownMenu(
                       controller: major,
-                      enableFilter: true,
                       hintText: tr('major'),
                       onSelected: (value) => setState(() {
                         major.text = value!;
@@ -110,13 +115,12 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                           List.generate(majors.length, (index) {
                         return DropdownMenuEntry(
                           value: majors[index],
-                          label: majors[index],
+                          label: majors[index] ?? tr('all'),
                         );
                       }),
                     ),
                   ),
                   DropdownMenu(
-                    enableFilter: true,
                     controller: teacher,
                     hintText: tr('teacher'),
                     onSelected: (value) => setState(() {
@@ -135,11 +139,11 @@ class _CoursesWidgetState extends State<CoursesWidget> {
               ),
               FutureBuilder<List<CourseModel>>(
                 future: context.read<MainRepo>().allCourses({
-                      'level': level,
-                      'semester': semester,
-                      'teacherId': teacherID,
-                      'major': majors.contains(major.text) ? major.text : null,
-                    }..removeWhere((key, value) => value == null)),
+                  'level': level,
+                  'semester': semester,
+                  'teacherId': teacherID,
+                  'major': majors.contains(major.text) ? major.text : null,
+                }),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(
@@ -163,7 +167,7 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                           );
                         },
                         child: Container(
-                          width: 400,
+                          width: 350,
                           margin: const EdgeInsets.all(10),
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(

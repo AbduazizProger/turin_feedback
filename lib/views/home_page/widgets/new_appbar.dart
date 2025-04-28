@@ -16,15 +16,24 @@ class NewAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      const Row(children: [
-        Icon(Icons.account_circle, size: 45),
-        SizedBox(width: 3),
-        Text('Username', style: TextStyles.blackW600S16),
+      Row(children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+          child: Image.asset(Images.logo2, height: 70),
+        ),
+        TextButton(
+          onPressed: () {
+            context.read<RoutesModel>().setRoute(Routes.main, context);
+          },
+          child: Text(tr('main'), style: TextStyles.mainW500S16),
+        ),
+        TextButton(
+          onPressed: () {
+            context.read<RoutesModel>().setRoute(Routes.questions, context);
+          },
+          child: Text(tr('questions'), style: TextStyles.mainW500S16),
+        ),
       ]),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Image.asset(Images.logo2, height: 70),
-      ),
       Row(children: [
         SizedBox(
           width: 300,

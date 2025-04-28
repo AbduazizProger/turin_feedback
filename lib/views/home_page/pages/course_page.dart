@@ -1,12 +1,11 @@
 import 'dart:ui';
-
-import 'package:easy_localization/easy_localization.dart';
-import 'package:feedback/const/colors.dart';
-import 'package:feedback/models/data/comment_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:feedback/const/colors.dart';
 import 'package:feedback/const/text_styles.dart';
+import 'package:feedback/models/data/comment_model.dart';
 import 'package:feedback/view_model/repo/main_repo.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:feedback/models/data/course_detail_model.dart';
 
 class CoursePage extends StatelessWidget {
@@ -80,7 +79,7 @@ class CoursePage extends StatelessWidget {
           ),
           Expanded(
             child: SingleChildScrollView(
-              child: Wrap(children: [
+              child: Wrap(alignment: WrapAlignment.spaceBetween, children: [
                 FittedBox(
                   child: Container(
                     height: 300,
@@ -163,49 +162,97 @@ class CoursePage extends StatelessWidget {
                 Container(
                   width: 350,
                   height: 350,
+                  margin: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(360),
                   ),
                 ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                    child: Container(
-                      margin: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: AppColors.blurColor,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: FutureBuilder<List<CommentModel>>(
-                        future: context.read<MainRepo>().getComments(
-                              '${snapshot.data!.subjectId}',
-                            ),
-                        builder: (context, snapshot) {
-                          return Column(
-                              children: List.generate(
-                            snapshot.data?.length ?? 0,
-                            (index) {
-                              return Container(
-                                margin: const EdgeInsets.all(10),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    width: 2,
-                                    color: Colors.grey,
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.blurColor,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: FutureBuilder<List<CommentModel>>(
+                          future: context.read<MainRepo>().getComments(
+                                '${snapshot.data!.subjectId}',
+                              ),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Row(children: [
+                                    Text(
+                                      tr('comments'),
+                                      style: TextStyles.blackW700S24,
+                                    ),
+                                  ]),
+                                ),
+                                Column(
+                                  children: List.generate(
+                                    snapshot.data?.length ?? 0,
+                                    (index) {
+                                      return Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(15),
+                                        // decoration: BoxDecoration(
+                                        //   borderRadius: BorderRadius.circular(10),
+                                        //   border: Border.all(
+                                        //     width: 2,
+                                        //     color: Colors.grey,
+                                        //   ),
+                                        // ),
+                                        child: Column(children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "${index + 1}",
+                                                style: TextStyles.blackW700S20,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  snapshot.data![index]
+                                                      .questionBody,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style:
+                                                      TextStyles.blackW700S24,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 20),
+                                              Text(
+                                                snapshot.data![index].answer,
+                                                style: TextStyles.blackW400S24,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          const Divider(color: Colors.grey),
+                                        ]),
+                                      );
+                                    },
                                   ),
                                 ),
-                                child: Text(
-                                  snapshot.data![index].answer,
-                                  style: TextStyles.blackW400S24,
-                                ),
-                              );
-                            },
-                          ));
-                        },
+                              ],
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),

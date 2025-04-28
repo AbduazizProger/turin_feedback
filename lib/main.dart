@@ -36,8 +36,8 @@ void main() async {
         BlocProvider(create: (context) => AuthBloc()),
         BlocProvider(create: (context) => MainBloc()),
         Provider(create: (context) => AuthRepo(prefs: prefs)),
-        Provider(create: (context) => MainRepo(prefs: prefs)),
         ChangeNotifierProvider(create: (context) => RoutesModel()),
+        Provider(create: (context) => MainRepo(prefs: prefs, context: context)),
       ],
       child: const MyApp(),
     ),
@@ -49,17 +49,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Feedback',
-      locale: context.locale,
-      routerConfig: Routes.router,
-      debugShowCheckedModeBanner: false,
-      supportedLocales: context.supportedLocales,
-      localizationsDelegates: context.localizationDelegates,
-      theme: ThemeData(
-        useMaterial3: true,
-        fontFamily: 'Inter',
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.main),
+    return Provider(
+      create: (context) => MainRepo(
+        context: context,
+        prefs: context.read<SharedPreferences>(),
+      ),
+      child: MaterialApp.router(
+        title: 'Feedback',
+        locale: context.locale,
+        routerConfig: Routes.router,
+        debugShowCheckedModeBanner: false,
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
+        theme: ThemeData(
+          useMaterial3: true,
+          fontFamily: 'Inter',
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.main),
+        ),
       ),
     );
   }
