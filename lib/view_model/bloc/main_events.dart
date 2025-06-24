@@ -8,6 +8,10 @@ abstract class MainEvent {
   final MainRepo mainRepo;
 }
 
+class MainInitialEvent extends MainEvent {
+  const MainInitialEvent({required super.mainRepo});
+}
+
 class AddCourseEvent extends MainEvent {
   const AddCourseEvent({
     required this.data,

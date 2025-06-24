@@ -71,47 +71,50 @@ class MainPage extends StatelessWidget {
                       return Row(
                         children:
                             List.generate(snapshot.data!.length, (rankIndex) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                snapshot
-                                        .data![snapshot.data!.length -
-                                            1 -
-                                            rankIndex]
-                                        .name ??
-                                    '',
-                                style: TextStyles.blackW400S7,
-                              ),
-                              Container(
-                                width: 58,
-                                height: 198 *
-                                    (snapshot
-                                            .data![snapshot.data!.length -
-                                                1 -
-                                                rankIndex]
-                                            .rating ??
-                                        0) /
-                                    10,
-                                margin: const EdgeInsets.all(3),
-                                decoration: const BoxDecoration(
-                                  gradient: AppColors.mainGradient,
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(5),
-                                  ),
+                          return Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  snapshot
+                                          .data![snapshot.data!.length -
+                                              1 -
+                                              rankIndex]
+                                          .name ??
+                                      '',
+                                  style: TextStyles.blackW400S7,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                child: Column(children: [
-                                  Text(
-                                    '${snapshot.data![snapshot.data!.length - 1 - rankIndex].rating ?? 0}',
-                                    style: TextStyles.whiteW400S12,
+                                Container(
+                                  width: 58,
+                                  height: 198 *
+                                      (snapshot
+                                              .data![snapshot.data!.length -
+                                                  1 -
+                                                  rankIndex]
+                                              .rating ??
+                                          0) /
+                                      10,
+                                  margin: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                    gradient: AppColors.mainGradient,
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(5),
+                                    ),
                                   ),
-                                  const Text(
-                                    'Excellent',
-                                    style: TextStyles.whiteW400S7,
-                                  ),
-                                ]),
-                              ),
-                            ],
+                                  child: Column(children: [
+                                    Text(
+                                      '${snapshot.data![snapshot.data!.length - 1 - rankIndex].rating ?? 0}',
+                                      style: TextStyles.whiteW400S12,
+                                    ),
+                                    const Text(
+                                      'Excellent',
+                                      style: TextStyles.whiteW400S7,
+                                    ),
+                                  ]),
+                                ),
+                              ],
+                            ),
                           );
                         }),
                       );

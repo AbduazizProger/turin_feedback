@@ -1,9 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:feedback/const/colors.dart';
 import 'package:feedback/const/text_styles.dart';
-import 'package:feedback/models/data/comment_model.dart';
 import 'package:feedback/view_model/repo/main_repo.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:feedback/models/data/course_detail_model.dart';
@@ -15,6 +16,8 @@ class CoursePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showComments = ValueNotifier(true);
+
     return FutureBuilder<CourseDetailModel>(
       future: context.read<MainRepo>().getCourse(id),
       builder: (context, snapshot) {
@@ -168,94 +171,9 @@ class CoursePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(360),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.blurColor,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: FutureBuilder<List<CommentModel>>(
-                          future: context.read<MainRepo>().getComments(
-                                '${snapshot.data!.subjectId}',
-                              ),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Row(children: [
-                                    Text(
-                                      tr('comments'),
-                                      style: TextStyles.blackW700S24,
-                                    ),
-                                  ]),
-                                ),
-                                Column(
-                                  children: List.generate(
-                                    snapshot.data?.length ?? 0,
-                                    (index) {
-                                      return Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.all(15),
-                                        // decoration: BoxDecoration(
-                                        //   borderRadius: BorderRadius.circular(10),
-                                        //   border: Border.all(
-                                        //     width: 2,
-                                        //     color: Colors.grey,
-                                        //   ),
-                                        // ),
-                                        child: Column(children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                "${index + 1}",
-                                                style: TextStyles.blackW700S20,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: Text(
-                                                  snapshot.data![index]
-                                                      .questionBody,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style:
-                                                      TextStyles.blackW700S24,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 20),
-                                              Text(
-                                                snapshot.data![index].answer,
-                                                style: TextStyles.blackW400S24,
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 10),
-                                          const Divider(color: Colors.grey),
-                                        ]),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
+                ShowQuestionsWidget(
+                  showComments: showComments,
+                  subjectId: snapshot.data!.subjectId,
                 ),
               ]),
             ),
@@ -264,4 +182,183 @@ class CoursePage extends StatelessWidget {
       },
     );
   }
+}
+
+class ShowQuestionsWidget extends StatelessWidget {
+  const ShowQuestionsWidget({
+    super.key,
+    required this.subjectId,
+    required this.showComments,
+  });
+
+  final int subjectId;
+  final ValueNotifier<bool> showComments;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.blurColor,
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: FutureBuilder<List<List>>(
+              future: (() async => [
+                    await context.read<MainRepo>().getComments('$subjectId'),
+                    await context
+                        .read<MainRepo>()
+                        .getMultiQuestions('$subjectId'),
+                  ])(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final comments = snapshot.data![0];
+                final multiQuestions = snapshot.data![1];
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Toggle Button
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: showComments,
+                        builder: (context, isComments, _) {
+                          return ToggleButtons(
+                            isSelected: [isComments, !isComments],
+                            onPressed: (index) {
+                              showComments.value = index == 0;
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            selectedColor: Colors.white,
+                            fillColor: AppColors.main2,
+                            color: Colors.black,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(tr('comments')),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(tr('multiple-choices')),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Content based on toggle
+                    ValueListenableBuilder<bool>(
+                      valueListenable: showComments,
+                      builder: (context, isComments, _) {
+                        return isComments
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Text(
+                                      tr('comments'),
+                                      style: TextStyles.blackW700S24,
+                                    ),
+                                  ),
+                                  ...List.generate(comments.length, (index) {
+                                    final item = comments[index];
+                                    return buildQuestionAnswerItem(index, item);
+                                  }),
+                                ],
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Text(
+                                      tr('multiple-choices'),
+                                      style: TextStyles.blackW700S24,
+                                    ),
+                                  ),
+                                  ...List.generate(multiQuestions.length,
+                                      (index) {
+                                    final item = multiQuestions[index];
+                                    return buildQuestionAnswerItem(index, item);
+                                  }),
+                                ],
+                              );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget buildQuestionAnswerItem(int index, dynamic item) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(15),
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("${index + 1}", style: TextStyles.blackW700S20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                item.questionBody,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyles.blackW700S24,
+              ),
+            ),
+            const SizedBox(width: 20),
+            item.answer is String
+                ? Text(item.answer, style: TextStyles.blackW400S24)
+                : SizedBox(
+                    width: 200,
+                    child: Column(
+                      children: List.generate(
+                        (item.answer as Map).length,
+                        (i) => Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              tr('${(item.answer as Map).keys.elementAt(i)}'),
+                              style: TextStyles.blackW400S14,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              (item.answer as Map)
+                                  .values
+                                  .elementAt(i)
+                                  .toString(),
+                              style: TextStyles.blackW400S14,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        const Divider(color: Colors.grey),
+      ],
+    ),
+  );
 }

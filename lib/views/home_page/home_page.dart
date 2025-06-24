@@ -1,8 +1,8 @@
-import 'package:feedback/const/images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:feedback/const/routes.dart';
+import 'package:feedback/const/images.dart';
 import 'package:feedback/models/routes_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:feedback/views/home_page/widgets/new_appbar.dart';
@@ -45,8 +45,9 @@ class HomePage extends StatelessWidget {
               ),
             ),
             Center(child: Image.asset(Images.logo, height: 450)),
-            Positioned.fill(
-              child: KeyedSubtree(key: GlobalKey(), child: child),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: child,
             ),
           ]),
         ),

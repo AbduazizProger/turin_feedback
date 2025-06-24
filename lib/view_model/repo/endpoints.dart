@@ -10,4 +10,5 @@ class Endpoints {
   static const String question = '$baseUrl/admin/question/';
   static const String comments = '$baseUrl/admin/comments/';
   static const String questions = '$baseUrl/admin/questions';
+  static const String feedbackQuestion = '$baseUrl/admin/feedback/question/';
 }

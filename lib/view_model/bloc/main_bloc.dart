@@ -9,7 +9,9 @@ class MainBloc extends Bloc<MainEvent, MainState> {
     on<MainEvent>((event, emit) async {
       emit(MainLoading());
       try {
-        if (event is RemoveQuestionEvent) {
+        if (event is MainInitialEvent) {
+          emit(MainInitial());
+        } else if (event is RemoveQuestionEvent) {
           final result = await event.mainRepo.removeQuestion(event.id);
           if (result) {
             emit(QuestionRemovedState());

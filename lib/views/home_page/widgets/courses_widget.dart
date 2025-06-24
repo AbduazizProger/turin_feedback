@@ -80,7 +80,16 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                       items: List.generate(levels.length, (index) {
                         return DropdownMenuItem(
                           value: levels[index],
-                          child: Text('${levels[index] ?? tr('all')}'),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${tr('level')}: ${levels[index] ?? tr('all')}',
+                            ),
+                          ),
                         );
                       }),
                       onChanged: (value) => setState(() {
@@ -96,7 +105,16 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     items: List.generate(semesters.length, (index) {
                       return DropdownMenuItem(
                         value: semesters[index],
-                        child: Text('${semesters[index] ?? tr('all')}'),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${tr('semester')}: ${semesters[index] ?? tr('all')}',
+                          ),
+                        ),
                       );
                     }),
                     onChanged: (value) => setState(() {
@@ -111,11 +129,31 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                       onSelected: (value) => setState(() {
                         major.text = value!;
                       }),
+                      inputDecorationTheme: InputDecorationTheme(
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        constraints: const BoxConstraints(maxHeight: 42),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                      ),
+                      trailingIcon: const Icon(
+                        Icons.keyboard_arrow_down,
+                      ),
+                      selectedTrailingIcon: const Icon(
+                        Icons.keyboard_arrow_up,
+                      ),
                       dropdownMenuEntries:
                           List.generate(majors.length, (index) {
                         return DropdownMenuEntry(
                           value: majors[index],
-                          label: majors[index] ?? tr('all'),
+                          label:
+                              '${tr('major')}: ${majors[index] ?? tr('all')}',
                         );
                       }),
                     ),
@@ -126,12 +164,31 @@ class _CoursesWidgetState extends State<CoursesWidget> {
                     onSelected: (value) => setState(() {
                       teacherID = value!.tid;
                     }),
+                    inputDecorationTheme: InputDecorationTheme(
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      constraints: const BoxConstraints(maxHeight: 42),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                    ),
+                    trailingIcon: const Icon(
+                      Icons.keyboard_arrow_down,
+                    ),
+                    selectedTrailingIcon: const Icon(
+                      Icons.keyboard_arrow_up,
+                    ),
                     dropdownMenuEntries:
                         List.generate(teachers.length, (index) {
                       return DropdownMenuEntry(
                         value: teachers[index],
                         label:
-                            '${teachers[index].name ?? ''} ${teachers[index].lastName ?? ''}',
+                            '${tr('teacher')}: ${teachers[index].name ?? ''} ${teachers[index].lastName ?? ''}',
                       );
                     }),
                   ),

@@ -14,6 +14,7 @@ import "package:feedback/models/data/question_model.dart";
 import "package:feedback/models/data/top_worst_model.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:feedback/models/data/course_detail_model.dart";
+import "package:feedback/models/data/multi_question_model.dart";
 
 class MainRepo {
   late final Dio dio;
@@ -88,7 +89,6 @@ class MainRepo {
   }
 
   Future<List<SubjectModel>> allSubjects() async {
-    print("allSubjects");
     final response = await dio
         .request(
       Endpoints.subjects,
@@ -170,6 +170,28 @@ class MainRepo {
     });
     return (response.data as List)
         .map((e) => CommentModel.fromJson(e))
+        .toList();
+  }
+
+  Future<List<dynamic>> getMultiQuestions(String id) async {
+    final response = await dio
+        .request(
+      "${Endpoints.feedbackQuestion}$id",
+      options: Options(method: 'GET', headers: {
+        "Accept": "application/json",
+        "authorization": "Bearer ${prefs.getString("token")}",
+      }),
+    )
+        .catchError((e) {
+      if (e.response?.statusCode == 401) {
+        prefs.remove('token');
+        context.read<RoutesModel>().setRoute(Routes.login, context);
+      } else {
+        throw e;
+      }
+    });
+    return (response.data as List)
+        .map((e) => MultiQuestionModel.fromJson(e))
         .toList();
   }
 

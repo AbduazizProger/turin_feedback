@@ -61,11 +61,11 @@ class QuestionPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         margin: const EdgeInsets.symmetric(vertical: 5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
+                        child: Row(children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(children: [
                                 Text(
                                   "${(snapshot.data[index] as QuestionModel).order ?? ''}. ",
                                   style: TextStyles.blackW600S16,
@@ -79,33 +79,36 @@ class QuestionPage extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () {
-                                    context.read<MainBloc>().add(
-                                          RemoveQuestionEvent(
-                                            id: (snapshot.data[index]
-                                                        as QuestionModel)
-                                                    .id ??
-                                                -1,
-                                            mainRepo: context.read<MainRepo>(),
-                                          ),
-                                        );
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
+                              ]),
+                              Text(
+                                (snapshot.data[index] as QuestionModel).type ??
+                                    '',
+                                style: TextStyles.blackW400S14,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                          Column(children: [
+                            IconButton(
+                              onPressed: () {
+                                context.read<MainBloc>().add(
+                                      RemoveQuestionEvent(
+                                        id: (snapshot.data[index]
+                                                    as QuestionModel)
+                                                .id ??
+                                            -1,
+                                        mainRepo: context.read<MainRepo>(),
+                                      ),
+                                    );
+                              },
+                              icon: const Icon(Icons.delete, color: Colors.red),
                             ),
-                            Text(
-                              (snapshot.data[index] as QuestionModel).type ??
-                                  '',
-                              style: TextStyles.blackW400S14,
-                              overflow: TextOverflow.ellipsis,
+                            IconButton(
+                              onPressed: () {},
+                              icon: const Icon(Icons.swap_vert_circle_outlined),
                             ),
-                          ],
-                        ),
+                          ]),
+                        ]),
                       ),
                     );
                   },
@@ -122,6 +125,9 @@ class QuestionPage extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) {
+                    context.read<MainBloc>().add(MainInitialEvent(
+                          mainRepo: context.read<MainRepo>(),
+                        ));
                     return const AddQuestion();
                   },
                 );

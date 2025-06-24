@@ -1,12 +1,14 @@
-import 'package:feedback/views/home_page/widgets/add_course.dart';
+import 'package:feedback/view_model/repo/main_repo.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:feedback/const/images.dart';
 import 'package:feedback/const/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:feedback/const/text_styles.dart';
 import 'package:feedback/models/routes_model.dart';
+import 'package:feedback/view_model/bloc/main_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:feedback/views/home_page/widgets/add_course.dart';
 
 class NewAppBar extends StatelessWidget {
   const NewAppBar({super.key, required this.search});
@@ -57,6 +59,9 @@ class NewAppBar extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (context) {
+                    context.read<MainBloc>().add(MainInitialEvent(
+                          mainRepo: context.read<MainRepo>(),
+                        ));
                     return const AddCourse();
                   },
                 );
